@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>لوحة تحكم الأدمن | BioCraft Central Control</title>
+
+  <!-- Google Fonts: Cairo & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'Inter', 'sans-serif'],
+            mono: ['Inter', 'monospace'],
+          },
+          colors: {
+            brand: {
+              cyan: '#00f2fe',
+              blue: '#4facfe',
+              gold: '#f59e0b',
+              purple: '#8b5cf6',
+              emerald: '#10b981',
+              dark: '#070b14',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome 6.5+ CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #070b14;
+      color: #f1f5f9;
+      font-family: 'Cairo', 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    /* Hardware acceleration & Glassmorphism */
+    .glass-card {
+      background: rgba(13, 19, 35, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transform: translate3d(0, 0, 0);
+      will-change: transform, opacity;
+    }
+    .glass-input {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .glass-input:focus {
+      outline: none;
+      border-color: #00f2fe;
+      box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.15);
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(7, 11, 20, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 242, 254, 0.4);
+    }
+    /* Switch styles */
+    .switch-checkbox:checked + .switch-label {
+      background-color: #10b981;
+    }
+    .switch-checkbox:checked + .switch-label .switch-dot {
+      transform: translateX(-1.25rem);
+    }
+    .badge-verified-toggle:checked + .verified-label {
+      background-color: #0284c7;
+    }
+    .badge-verified-toggle:checked + .verified-label .verified-dot {
+      transform: translateX(-1.25rem);
+    }
+    /* Toast animation */
+    #adminToast {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      transform: translate3d(0, 2rem, 0);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #adminToast.show {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body class="min-h-screen relative antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
+
+  <!-- ============================================================== -->
+  <!-- 1. AUTHENTICATION GATE SCREEN (شاشة تسجيل الدخول الزجاجية الفخمة) -->
+  <!-- ============================================================== -->
+  <div id="authGate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070b14]/95 backdrop-blur-xl">
+    <div class="glass-card max-w-md w-full p-8 rounded-3xl relative overflow-hidden border border-white/10 shadow-2xl shadow-cyan-500/10">
+      <!-- Glow ambient behind card -->
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Header & Logo -->
+      <div class="text-center mb-8 relative">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 text-cyan-400 mb-4 shadow-lg shadow-cyan-500/20">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-black text-white tracking-wide">BioCraft Central</h1>
+        <p class="text-xs text-slate-400 mt-1">لوحة الأدمن المشفرة للتحكم السحابي عن بُعد</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4 relative">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">البريد الإلكتروني للأدمن</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500 text-xs">
+              <i class="fa-solid fa-envelope"></i>
+            </span>
+            <input type="email" id="loginEmail" required class="glass-input w-full pr-9 pl-3 py-2.5 rounded-xl text-xs" placeholder="admin@biocraft.pro" value="admin@biocraft.pro" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">كلمة المرور السرية</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500 text-xs">
+              <i class="fa-solid fa-lock"></i>
+            </span>
+            <input type="password" id="loginPassword" required class="glass-input w-full pr-9 pl-3 py-2.5 rounded-xl text-xs" placeholder="••••••••••••" value="admin123456" />
+          </div>
+        </div>
+
+        <div id="loginErrorMsg" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span id="loginErrorText">بيانات الدخول غير صحيحة</span>
+        </div>
+
+        <button type="submit" id="loginSubmitBtn" class="w-full py-3 px-4 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span>تسجيل الدخول إلى لوحة الأدمن</span>
+        </button>
+
+        <div class="pt-4 border-t border-white/5 text-center">
+          <button type="button" onclick="quickDemoLogin()" class="text-xs text-cyan-400 hover:text-cyan-300 underline flex items-center justify-center gap-1.5 mx-auto transition-colors">
+            <i class="fa-solid fa-bolt"></i>
+            <span>دخول تجريبي فوري (وضع المحاكاة السريع)</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 2. MAIN ADMIN DASHBOARD INTERFACE (الواجهة الرئيسية للوحة الأدمن) -->
+  <!-- ============================================================== -->
+  <div id="mainDashboard" class="hidden min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="glass-card sticky top-0 z-40 border-b border-white/10 px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Brand Shield Icon -->
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-500/10">
+          <i class="fa-solid fa-shield-halved text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-extrabold text-white tracking-wide">BioCraft Central</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 font-bold">Admin v2.0</span>
+          </div>
+          <p class="text-[10px] text-slate-400 hidden sm:block">لوحة التحكم المشفرة لإدارة منصة البطاقات الرقمية</p>
+        </div>
+      </div>
+
+      <!-- Action items -->
+      <div class="flex items-center gap-3">
+        <!-- Live status indicator -->
+        <div id="dbStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="dbStatusText">متصل بالسحابة</span>
+        </div>
+
+        <!-- Open Public Platform Button -->
+        <a id="publicPlatformLink" href="https://1234567890vi.github.io/linkbio-generator" target="_blank" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          <span class="hidden md:inline">فتح المنصة العامة</span>
+        </a>
+
+        <!-- Sign Out Button -->
+        <button onclick="handleSignOut()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 transition-colors flex items-center gap-1.5">
+          <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          <span>خروج</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+      <!-- ============================================================== -->
+      <!-- SECTION 1: 4 TOP KPI CARDS (بطاقات المؤشرات الرقمية الرئيسية) -->
+      <!-- ============================================================== -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Total Sites -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-cyan-400/30 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400">إجمالي المواقع المنشأة</span>
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-400/20 text-cyan-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiTotalSites" class="text-2xl sm:text-3xl font-black text-white font-mono">0</span>
+            <span class="text-[10px] text-cyan-400 font-semibold">موقعاً مسجلاً</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
+            <i class="fa-solid fa-arrow-trend-up text-emerald-400"></i>
+            <span>تحديث فوري من قاعدة البيانات</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Total Platform Views -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-blue-400/30 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400">إجمالي الزيارات عبر المنصة</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-400/20 text-blue-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiTotalViews" class="text-2xl sm:text-3xl font-black text-white font-mono">0</span>
+            <span class="text-[10px] text-blue-400 font-semibold">مشاهدة حقيقية</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>معدودة عبر دالة RPC الآمنة</span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Active vs Suspended -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-400/30 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400">حالة المواقع (نشطة / موقوفة)</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-400/20 text-emerald-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-toggle-on"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-3">
+            <div class="flex items-baseline gap-1">
+              <span id="kpiActiveSites" class="text-2xl font-black text-emerald-400 font-mono">0</span>
+              <span class="text-[10px] text-slate-400">نشط</span>
+            </div>
+            <span class="text-slate-600">/</span>
+            <div class="flex items-baseline gap-1">
+              <span id="kpiSuspendedSites" class="text-2xl font-black text-rose-400 font-mono">0</span>
+              <span class="text-[10px] text-slate-400">موقوف</span>
+            </div>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
+            <i class="fa-solid fa-sliders text-cyan-400"></i>
+            <span>تحكم مباشر بزر تفعيل واحد</span>
+          </div>
+        </div>
+
+        <!-- KPI 4: Verified Sites -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-amber-400/30 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400">المواقع الموثّقة بالشارة</span>
+            <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-400/20 text-sky-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiVerifiedSites" class="text-2xl sm:text-3xl font-black text-sky-400 font-mono">0</span>
+            <span class="text-[10px] text-slate-400 font-semibold">حسابات رسمية</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
+            <i class="fa-solid fa-award text-sky-400"></i>
+            <span>شارة التوثيق الزرقاء الحصرية</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SECTION 2: ANALYTICS CHARTS (الرسوم البيانية التفاعلية عبر Chart.js) -->
+      <!-- ============================================================== -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart 1: Top Visited Sites -->
+        <div class="glass-card p-5 sm:p-6 rounded-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-chart-simple text-cyan-400 text-sm"></i>
+              <h2 class="text-sm font-bold text-white">أكثر 10 مواقع زيارةً على المنصة</h2>
+            </div>
+            <span class="text-[11px] text-slate-400 font-mono">Top Traffic</span>
+          </div>
+          <div class="relative h-64 sm:h-72 w-full">
+            <canvas id="topSitesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Recent Growth Trend -->
+        <div class="glass-card p-5 sm:p-6 rounded-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-wave-square text-blue-400 text-sm"></i>
+              <h2 class="text-sm font-bold text-white">معدل إنشاء المواقع الجديدة (آخر 7 أيام)</h2>
+            </div>
+            <span class="text-[11px] text-slate-400 font-mono">7-Day Growth</span>
+          </div>
+          <div class="relative h-64 sm:h-72 w-full">
+            <canvas id="growthTrendChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SECTION 3: SITES MANAGEMENT TABLE (جدول إدارة المواقع الاحترافي) -->
+      <!-- ============================================================== -->
+      <section class="glass-card rounded-2xl overflow-hidden border border-white/10">
+        <!-- Table Header & Controls -->
+        <div class="p-4 sm:p-5 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-400/20 text-cyan-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-table-list"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-white">قائمة المواقع والبطاقات الرقمية</h2>
+              <p class="text-[11px] text-slate-400">إدارة وتعديل وتوثيق المواقع عن بُعد</p>
+            </div>
+          </div>
+
+          <!-- Filters & Search -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Search Box -->
+            <div class="relative flex-1 sm:w-64">
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500 text-xs">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </span>
+              <input type="text" id="tableSearchInput" oninput="handleTableSearch()" class="glass-input w-full pr-8 pl-3 py-1.5 rounded-xl text-xs" placeholder="بحث بالاسم أو الرابط..." />
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 text-[11px]">
+              <button onclick="setTableFilter('all')" id="filterBtn-all" class="px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition-colors">الكل</button>
+              <button onclick="setTableFilter('active')" id="filterBtn-active" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">النشطة</button>
+              <button onclick="setTableFilter('suspended')" id="filterBtn-suspended" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">الموقوفة</button>
+              <button onclick="setTableFilter('verified')" id="filterBtn-verified" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">الموثقة</button>
+            </div>
+
+            <!-- Refresh Button -->
+            <button onclick="loadDashboardData()" title="تحديث البيانات" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-cyan-400 transition-colors">
+              <i class="fa-solid fa-arrows-rotate text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-white/[0.02] border-b border-white/5 text-slate-400 font-semibold text-[11px]">
+              <tr>
+                <th class="py-3 px-4">الموقع والمستخدم</th>
+                <th class="py-3 px-4">الرابط السحابي</th>
+                <th class="py-3 px-4">القالب</th>
+                <th class="py-3 px-4">الزيارات</th>
+                <th class="py-3 px-4">توثيق (Verified)</th>
+                <th class="py-3 px-4">الحالة (Active)</th>
+                <th class="py-3 px-4 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="sitesTableBody" class="divide-y divide-white/5">
+              <!-- Rendered Dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div id="tableEmptyState" class="hidden p-12 text-center text-slate-400">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 mb-3">
+            <i class="fa-solid fa-folder-open text-xl"></i>
+          </div>
+          <p class="text-xs font-bold text-slate-300">لا توجد مواقع مطابقة للبحث</p>
+          <p class="text-[11px] text-slate-500 mt-1">جرّب تغيير كلمات البحث أو الفلاتر المحددة</p>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SECTION 4: PLATFORM REMOTE SETTINGS & BACKUPS (إعدادات المنصة العامة) -->
+      <!-- ============================================================== -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Settings Form (2 columns) -->
+        <div class="lg:col-span-2 glass-card p-5 sm:p-6 rounded-2xl">
+          <div class="flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-sliders text-cyan-400 text-sm"></i>
+            <h2 class="text-sm font-bold text-white">التحكم العام في المنصة عن بُعد (platform_settings)</h2>
+          </div>
+
+          <form onsubmit="handleSaveSettings(event)" class="space-y-4">
+            <!-- Switches Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <!-- Maintenance Mode -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xs font-bold text-slate-200">وضع الصيانة (Maintenance Mode)</h3>
+                  <p class="text-[10px] text-slate-400">إيقاف المنصة مؤقتاً لعرض شاشة الصيانة</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="settingMaintenance" class="sr-only switch-checkbox" />
+                  <div class="switch-label w-11 h-6 bg-slate-700 rounded-full transition-colors">
+                    <div class="switch-dot w-4 h-4 bg-white rounded-full transition-transform m-1"></div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Allow New Registrations -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xs font-bold text-slate-200">السماح بإنشاء مواقع جديدة</h3>
+                  <p class="text-[10px] text-slate-400">إتاحة زر توليد المواقع لزوار المنصة</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="settingAllowSites" class="sr-only switch-checkbox" checked />
+                  <div class="switch-label w-11 h-6 bg-slate-700 rounded-full transition-colors">
+                    <div class="switch-dot w-4 h-4 bg-white rounded-full transition-transform m-1"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Announcement Bar -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                شريط الإعلان العلوي للمنصة العامة (اتركه فارغاً لإخفائه)
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500 text-xs">
+                  <i class="fa-solid fa-bullhorn"></i>
+                </span>
+                <input type="text" id="settingAnnouncement" class="glass-input w-full pr-9 pl-3 py-2 rounded-xl text-xs" placeholder="مثال: مرحباً بكم في منصة BioCraft — أصدرنا قوالب جديدة فخمة!" />
+              </div>
+            </div>
+
+            <!-- Default Theme -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">القالب الافتراضي للمستخدمين الجدد</label>
+              <select id="settingDefaultTheme" class="glass-input w-full py-2 px-3 rounded-xl text-xs cursor-pointer bg-slate-900">
+                <option value="obsidian">Obsidian Neon (الأسود النيون)</option>
+                <option value="royal">Royal Gold (الذهبي الملكي)</option>
+                <option value="cyber">Cyber Purple (البنفسجي السايبر)</option>
+                <option value="emerald">Emerald Dark (الزمردي الليلي)</option>
+                <option value="minimal">Minimal Light (الأبيض الناصع)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 hover:brightness-110 active:scale-95 transition-all shadow-md shadow-cyan-500/20 flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>حفظ إعدادات المنصة عن بُعد</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Backup & Quick Tools (1 column) -->
+        <div class="glass-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <i class="fa-solid fa-cloud-arrow-down text-blue-400 text-sm"></i>
+              <h2 class="text-sm font-bold text-white">النسخ الاحتياطي وتصدير البيانات</h2>
+            </div>
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+              قم بتنزيل نسخة كاملة من جميع بيانات المواقع والروابط للاحتفاظ بها كنسخة احتياطية أو تحليلها في Excel.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <button onclick="exportBackupJSON()" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors flex items-center justify-center gap-2">
+              <i class="fa-solid fa-file-code text-cyan-400"></i>
+              <span>تصدير نسخة كاملة (JSON)</span>
+            </button>
+            <button onclick="exportBackupCSV()" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors flex items-center justify-center gap-2">
+              <i class="fa-solid fa-file-csv text-emerald-400"></i>
+              <span>تصدير تقرير المواقع (CSV / Excel)</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-white/5 py-4 px-6 text-center text-xs text-slate-500">
+      <span>منصة BioCraft Central &copy; 2026 — نظام الأدمن المستقل المشفر</span>
+    </footer>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 3. EDIT PROFILE MODAL (نافذة تعديل بيانات أي موقع) -->
+  <!-- ============================================================== -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-card max-w-lg w-full p-6 rounded-3xl border border-white/10 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-cyan-400 text-sm"></i>
+          <h3 class="text-sm font-bold text-white">تعديل بيانات الموقع</h3>
+        </div>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleEditSubmit(event)" class="space-y-4">
+        <input type="hidden" id="editModalSlug" />
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">الاسم الكامل / الظاهر</label>
+          <input type="text" id="editModalDisplayName" required class="glass-input w-full px-3 py-2 rounded-xl text-xs" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">عنوان الموقع (Site Title)</label>
+          <input type="text" id="editModalSiteTitle" class="glass-input w-full px-3 py-2 rounded-xl text-xs" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">النبذة التعريفية (Bio)</label>
+          <textarea id="editModalBio" rows="3" class="glass-input w-full px-3 py-2 rounded-xl text-xs resize-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">القالب المستخدم</label>
+          <select id="editModalTheme" class="glass-input w-full py-2 px-3 rounded-xl text-xs bg-slate-900 cursor-pointer">
+            <option value="obsidian">Obsidian Neon</option>
+            <option value="royal">Royal Gold</option>
+            <option value="cyber">Cyber Purple</option>
+            <option value="emerald">Emerald Dark</option>
+            <option value="minimal">Minimal Light</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-xl text-xs text-slate-300 hover:bg-white/5 transition-colors">إلغاء</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 hover:brightness-110 transition-colors">حفظ التعديلات</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 4. DELETE CONFIRMATION MODAL (نافذة تأكيد الحذف النهائي) -->
+  <!-- ============================================================== -->
+  <div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-card max-w-sm w-full p-6 rounded-3xl border border-rose-500/20 shadow-2xl relative text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-lg mx-auto mb-3">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="text-sm font-bold text-white mb-1">تأكيد حذف الموقع نهائياً؟</h3>
+      <p class="text-xs text-slate-400 mb-4">
+        سيتم حذف الموقع <span id="deleteModalTargetSlug" class="font-bold text-rose-400 font-mono"></span> بشكل نهائي من قاعدة البيانات ولا يمكن التراجع عن هذا الإجراء.
+      </p>
+
+      <div class="flex items-center justify-center gap-2">
+        <button onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl text-xs text-slate-300 hover:bg-white/5 transition-colors">إلغاء</button>
+        <button onclick="confirmDeleteSite()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-500 text-white hover:bg-rose-600 transition-colors">نعم، احذف الموقع</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 5. FLOATING TOAST NOTIFICATION (إشعار منبثق فخم وسلس) -->
+  <!-- ============================================================== -->
+  <div id="adminToast" class="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-900/90 border border-cyan-400/30 text-white shadow-xl shadow-cyan-500/10 text-xs">
+    <i class="fa-solid fa-circle-check text-cyan-400"></i>
+    <span id="toastMessage">تم الحفظ بنجاح</span>
+  </div>
+
+  <!-- Load Supabase Config script -->
+  <script src="./supabase-config.js"></script>
+
+  <!-- ============================================================== -->
+  <!-- MAIN CONTROLLER SCRIPT -->
+  <!-- ============================================================== -->
+  <script>
+    let currentProfilesData = [];
+    let currentSettingsData = {};
+    let activeFilter = 'all';
+    let searchQuery = '';
+    let topSitesChartInstance = null;
+    let growthTrendChartInstance = null;
+    let pendingDeleteSlug = null;
+
+    // Toast helper
+    function showToast(msg) {
+      const toast = document.getElementById('adminToast');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    // ==========================================
+    // AUTHENTICATION LOGIC
+    // ==========================================
+    async function checkAuthOnStartup() {
+      const user = await checkAdminSession();
+      if (user) {
+        revealDashboard(user);
+      } else {
+        document.getElementById('authGate').classList.remove('hidden');
+        document.getElementById('mainDashboard').classList.add('hidden');
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      const errBox = document.getElementById('loginErrorMsg');
+      const errTxt = document.getElementById('loginErrorText');
+      errBox.classList.add('hidden');
+
+      try {
+        const user = await adminSignIn(email, pass);
+        revealDashboard(user);
+        showToast('تم تسجيل الدخول بنجاح');
+      } catch (err) {
+        errBox.classList.remove('hidden');
+        errTxt.textContent = err.message || 'بيانات الدخول غير صحيحة';
+      }
+    }
+
+    function quickDemoLogin() {
+      document.getElementById('loginEmail').value = 'admin@biocraft.pro';
+      document.getElementById('loginPassword').value = 'admin123456';
+      adminSignIn('admin@biocraft.pro', 'admin123456').then(user => {
+        revealDashboard(user);
+        showToast('تم الدخول في وضع المعاينة التجريبي');
+      });
+    }
+
+    function revealDashboard(user) {
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('hidden');
+
+      // Update Public Platform link
+      if (typeof PUBLIC_PLATFORM_URL !== 'undefined') {
+        document.getElementById('publicPlatformLink').href = PUBLIC_PLATFORM_URL;
+      }
+
+      loadDashboardData();
+    }
+
+    async function handleSignOut() {
+      if (confirm('هل ترغب حقاً في تسجيل الخروج من لوحة الأدمن؟')) {
+        await adminSignOut();
+        location.reload();
+      }
+    }
+
+    // ==========================================
+    // DATA FETCHING & UI RENDERING
+    // ==========================================
+    async function loadDashboardData() {
+      const result = await fetchDashboardData();
+      currentProfilesData = result.profiles || [];
+      currentSettingsData = result.settings || {};
+
+      // DB Status Badge
+      const statusBadge = document.getElementById('dbStatusBadge');
+      const statusText = document.getElementById('dbStatusText');
+      if (result.isLiveSupabase) {
+        statusBadge.className = 'hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400';
+        statusText.textContent = 'متصل بـ Supabase';
+      } else {
+        statusBadge.className = 'hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-400';
+        statusText.textContent = 'وضع المعاينة المحلي';
+      }
+
+      updateKPICards();
+      renderAnalyticsCharts();
+      renderSitesTable();
+      populateSettingsForm();
+    }
+
+    function updateKPICards() {
+      const total = currentProfilesData.length;
+      const views = currentProfilesData.reduce((acc, p) => acc + (Number(p.views_count) || 0), 0);
+      const active = currentProfilesData.filter(p => p.is_active !== false).length;
+      const suspended = total - active;
+      const verified = currentProfilesData.filter(p => Boolean(p.verified)).length;
+
+      document.getElementById('kpiTotalSites').textContent = total.toLocaleString();
+      document.getElementById('kpiTotalViews').textContent = views.toLocaleString();
+      document.getElementById('kpiActiveSites').textContent = active.toLocaleString();
+      document.getElementById('kpiSuspendedSites').textContent = suspended.toLocaleString();
+      document.getElementById('kpiVerifiedSites').textContent = verified.toLocaleString();
+    }
+
+    // ==========================================
+    // CHARTS RENDERING (Chart.js)
+    // ==========================================
+    function renderAnalyticsCharts() {
+      const top10 = [...currentProfilesData]
+        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
+        .slice(0, 10);
+
+      // 1. Top Sites Chart
+      const ctx1 = document.getElementById('topSitesChart').getContext('2d');
+      if (topSitesChartInstance) topSitesChartInstance.destroy();
+
+      topSitesChartInstance = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: top10.map(p => p.slug || p.display_name),
+          datasets: [{
+            label: 'عدد الزيارات',
+            data: top10.map(p => p.views_count || 0),
+            backgroundColor: 'rgba(0, 242, 254, 0.45)',
+            borderColor: '#00f2fe',
+            borderWidth: 1.5,
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'Cairo', size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+            }
+          }
+        }
+      });
+
+      // 2. 7-Day Growth Trend Chart
+      const ctx2 = document.getElementById('growthTrendChart').getContext('2d');
+      if (growthTrendChartInstance) growthTrendChartInstance.destroy();
+
+      // Generate last 7 days labels
+      const days = [];
+      const counts = [0, 0, 0, 0, 0, 0, 0];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000);
+        days.push(d.toLocaleDateString('ar-DZ', { weekday: 'short', month: 'numeric', day: 'numeric' }));
+      }
+
+      currentProfilesData.forEach(p => {
+        if (!p.created_at) return;
+        const diffDays = Math.floor((Date.now() - new Date(p.created_at).getTime()) / 86400000);
+        if (diffDays >= 0 && diffDays < 7) {
+          counts[6 - diffDays]++;
+        }
+      });
+
+      growthTrendChartInstance = new Chart(ctx2, {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'مواقع جديدة',
+            data: counts,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#00f2fe',
+            pointRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'Cairo', size: 10 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { stepSize: 1, color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    // ==========================================
+    // SITES TABLE CONTROLS & RENDERING
+    // ==========================================
+    function setTableFilter(filter) {
+      activeFilter = filter;
+      ['all', 'active', 'suspended', 'verified'].forEach(f => {
+        const btn = document.getElementById(`filterBtn-${f}`);
+        if (f === filter) {
+          btn.className = 'px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition-colors';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors';
+        }
+      });
+      renderSitesTable();
+    }
+
+    function handleTableSearch() {
+      searchQuery = document.getElementById('tableSearchInput').value.trim().toLowerCase();
+      renderSitesTable();
+    }
+
+    function renderSitesTable() {
+      const tbody = document.getElementById('sitesTableBody');
+      const emptyState = document.getElementById('tableEmptyState');
+      tbody.innerHTML = '';
+
+      let filtered = currentProfilesData.filter(p => {
+        const matchesSearch = !searchQuery || 
+          (p.slug && p.slug.toLowerCase().includes(searchQuery)) ||
+          (p.display_name && p.display_name.toLowerCase().includes(searchQuery)) ||
+          (p.site_title && p.site_title.toLowerCase().includes(searchQuery));
+
+        if (!matchesSearch) return false;
+
+        if (activeFilter === 'active') return p.is_active !== false;
+        if (activeFilter === 'suspended') return p.is_active === false;
+        if (activeFilter === 'verified') return Boolean(p.verified);
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      filtered.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-white/[0.02] transition-colors';
+
+        // Public live URL
+        const siteUrl = `${PUBLIC_PLATFORM_URL}/view.html?slug=${p.slug}`;
+        const avatarSrc = p.avatar_data || 'https://via.placeholder.com/64/070b14/00f2fe?text=Avatar';
+
+        const themeLabels = {
+          obsidian: 'Obsidian Neon',
+          royal: 'Royal Gold',
+          cyber: 'Cyber Purple',
+          emerald: 'Emerald Dark',
+          minimal: 'Minimal Light'
+        };
+
+        tr.innerHTML = `
+          <!-- Name & Avatar -->
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-3">
+              <img src="${avatarSrc}" onerror="this.src='https://via.placeholder.com/64/070b14/00f2fe?text=Bio'" class="w-8 h-8 rounded-full object-cover border border-cyan-400/30 flex-shrink-0" />
+              <div>
+                <div class="font-bold text-white flex items-center gap-1.5">
+                  <span>${escapeHtml(p.display_name || 'بدون اسم')}</span>
+                  ${p.verified ? '<i class="fa-solid fa-circle-check text-sky-400 text-xs" title="موثق"></i>' : ''}
+                </div>
+                <div class="text-[10px] text-slate-400 truncate max-w-[160px]">${escapeHtml(p.bio || p.site_title || '')}</div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Short Slug & Link -->
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-1.5 font-mono text-cyan-300">
+              <span class="text-slate-500">/u/</span>
+              <span>${escapeHtml(p.slug)}</span>
+              <a href="${siteUrl}" target="_blank" title="فتح الموقع في تبويب جديد" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </a>
+            </div>
+          </td>
+
+          <!-- Theme -->
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/5 border border-white/10 text-slate-300">
+              ${themeLabels[p.theme] || p.theme || 'Obsidian'}
+            </span>
+          </td>
+
+          <!-- Views Count -->
+          <td class="py-3 px-4 font-mono font-bold text-slate-200">
+            <div class="flex items-center gap-1">
+              <i class="fa-regular fa-eye text-slate-500 text-[10px]"></i>
+              <span>${(p.views_count || 0).toLocaleString()}</span>
+            </div>
+          </td>
+
+          <!-- Verified Switch -->
+          <td class="py-3 px-4">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" ${p.verified ? 'checked' : ''} onchange="handleToggleVerified('${p.slug}', ${Boolean(p.verified)})" class="sr-only badge-verified-toggle" />
+              <div class="verified-label w-9 h-5 bg-slate-700 rounded-full transition-colors">
+                <div class="verified-dot w-3 h-3 bg-white rounded-full transition-transform m-1"></div>
+              </div>
+            </label>
+          </td>
+
+          <!-- Active Switch -->
+          <td class="py-3 px-4">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" ${p.is_active !== false ? 'checked' : ''} onchange="handleToggleActive('${p.slug}', ${p.is_active !== false})" class="sr-only switch-checkbox" />
+              <div class="switch-label w-9 h-5 bg-slate-700 rounded-full transition-colors">
+                <div class="switch-dot w-3 h-3 bg-white rounded-full transition-transform m-1"></div>
+              </div>
+            </label>
+          </td>
+
+          <!-- Actions -->
+          <td class="py-3 px-4 text-center">
+            <div class="inline-flex items-center gap-1">
+              <button onclick="openEditModal('${p.slug}')" title="تعديل" class="p-1.5 rounded-lg bg-white/5 hover:bg-cyan-500/10 hover:text-cyan-400 text-slate-400 transition-colors">
+                <i class="fa-solid fa-pen-to-square text-xs"></i>
+              </button>
+              <button onclick="openDeleteModal('${p.slug}')" title="حذف نهائي" class="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/10 hover:text-rose-400 text-slate-400 transition-colors">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==========================================
+    // TOGGLES (VERIFIED & ACTIVE)
+    // ==========================================
+    async function handleToggleVerified(slug, currentVal) {
+      try {
+        const next = await toggleProfileVerification(slug, currentVal);
+        showToast(next ? `تم منح شارة التوثيق لـ (${slug})` : `تم سحب شارة التوثيق من (${slug})`);
+        loadDashboardData();
+      } catch (err) {
+        alert('تعذر تحديث شارة التوثيق: ' + err.message);
+      }
+    }
+
+    async function handleToggleActive(slug, currentVal) {
+      try {
+        const next = await toggleProfileStatus(slug, currentVal);
+        showToast(next ? `تم تفعيل الموقع (${slug})` : `تم إيقاف الموقع (${slug})`);
+        loadDashboardData();
+      } catch (err) {
+        alert('تعذر تحديث حالة الموقع: ' + err.message);
+      }
+    }
+
+    // ==========================================
+    // EDIT MODAL LOGIC
+    // ==========================================
+    function openEditModal(slug) {
+      const p = currentProfilesData.find(x => x.slug === slug);
+      if (!p) return;
+
+      document.getElementById('editModalSlug').value = slug;
+      document.getElementById('editModalDisplayName').value = p.display_name || '';
+      document.getElementById('editModalSiteTitle').value = p.site_title || '';
+      document.getElementById('editModalBio').value = p.bio || '';
+      document.getElementById('editModalTheme').value = p.theme || 'obsidian';
+
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    async function handleEditSubmit(e) {
+      e.preventDefault();
+      const slug = document.getElementById('editModalSlug').value;
+      const updates = {
+        display_name: document.getElementById('editModalDisplayName').value.trim(),
+        site_title: document.getElementById('editModalSiteTitle').value.trim(),
+        bio: document.getElementById('editModalBio').value.trim(),
+        theme: document.getElementById('editModalTheme').value,
+      };
+
+      try {
+        await updateProfileRemote(slug, updates);
+        closeEditModal();
+        showToast('تم تحديث بيانات الموقع بنجاح');
+        loadDashboardData();
+      } catch (err) {
+        alert('فشل حفظ التعديلات: ' + err.message);
+      }
+    }
+
+    // ==========================================
+    // DELETE MODAL LOGIC
+    // ==========================================
+    function openDeleteModal(slug) {
+      pendingDeleteSlug = slug;
+      document.getElementById('deleteModalTargetSlug').textContent = slug;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteSlug = null;
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    async function confirmDeleteSite() {
+      if (!pendingDeleteSlug) return;
+      try {
+        await deleteProfileRemote(pendingDeleteSlug);
+        closeDeleteModal();
+        showToast('تم حذف الموقع نهائياً');
+        loadDashboardData();
+      } catch (err) {
+        alert('تعذر حذف الموقع: ' + err.message);
+      }
+    }
+
+    // ==========================================
+    // PLATFORM SETTINGS LOGIC
+    // ==========================================
+    function populateSettingsForm() {
+      document.getElementById('settingMaintenance').checked = Boolean(currentSettingsData.maintenance_mode);
+      document.getElementById('settingAllowSites').checked = currentSettingsData.allow_new_sites !== false;
+      document.getElementById('settingAnnouncement').value = currentSettingsData.announcement_text || '';
+      document.getElementById('settingDefaultTheme').value = currentSettingsData.default_theme || 'obsidian';
+    }
+
+    async function handleSaveSettings(e) {
+      e.preventDefault();
+      const newSettings = {
+        maintenance_mode: document.getElementById('settingMaintenance').checked,
+        allow_new_sites: document.getElementById('settingAllowSites').checked,
+        announcement_text: document.getElementById('settingAnnouncement').value.trim() || null,
+        default_theme: document.getElementById('settingDefaultTheme').value,
+      };
+
+      try {
+        await updatePlatformSettingsRemote(newSettings);
+        showToast('تم حفظ إعدادات المنصة عن بُعد بنجاح');
+      } catch (err) {
+        alert('فشل حفظ الإعدادات: ' + err.message);
+      }
+    }
+
+    // ==========================================
+    // BACKUP & EXPORTS (JSON & CSV)
+    // ==========================================
+    function exportBackupJSON() {
+      const exportData = {
+        exported_at: new Date().toISOString(),
+        total_profiles: currentProfilesData.length,
+        platform_settings: currentSettingsData,
+        profiles: currentProfilesData
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      downloadBlob(blob, `biocraft_backup_${formatDateStamp()}.json`);
+      showToast('تم تصدير ملف النسخة الاحتياطية (JSON)');
+    }
+
+    function exportBackupCSV() {
+      const headers = ['Slug', 'Display Name', 'Site Title', 'Views', 'Verified', 'Active', 'Theme', 'Created At'];
+      const rows = currentProfilesData.map(p => [
+        `"${p.slug || ''}"`,
+        `"${(p.display_name || '').replace(/"/g, '""')}"`,
+        `"${(p.site_title || '').replace(/"/g, '""')}"`,
+        p.views_count || 0,
+        p.verified ? 'YES' : 'NO',
+        p.is_active !== false ? 'ACTIVE' : 'SUSPENDED',
+        `"${p.theme || 'obsidian'}"`,
+        `"${p.created_at || ''}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+      downloadBlob(blob, `biocraft_sites_report_${formatDateStamp()}.csv`);
+      showToast('تم تصدير تقرير المواقع (CSV)');
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function formatDateStamp() {
+      const d = new Date();
+      return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[m]);
+    }
+
+    // Startup check
+    window.addEventListener('DOMContentLoaded', checkAuthOnStartup);
+  </script>
+</body>
+</html>
