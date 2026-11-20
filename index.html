@@ -57,7 +57,6 @@
       font-family: 'Cairo', 'Inter', sans-serif;
       overflow-x: hidden;
     }
-    /* Hardware acceleration & Glassmorphism */
     .glass-card {
       background: rgba(13, 19, 35, 0.72);
       backdrop-filter: blur(16px);
@@ -77,7 +76,6 @@
       border-color: #00f2fe;
       box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.15);
     }
-    /* Custom scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -92,7 +90,6 @@
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(0, 242, 254, 0.4);
     }
-    /* Switch styles */
     .switch-checkbox:checked + .switch-label {
       background-color: #10b981;
     }
@@ -105,7 +102,12 @@
     .badge-verified-toggle:checked + .verified-label .verified-dot {
       transform: translateX(-1.25rem);
     }
-    /* Toast animation */
+    .badge-vip-toggle:checked + .vip-label {
+      background-color: #f59e0b;
+    }
+    .badge-vip-toggle:checked + .vip-label .vip-dot {
+      transform: translateX(-1.25rem);
+    }
     #adminToast {
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
       transform: translate3d(0, 2rem, 0);
@@ -126,11 +128,9 @@
   <!-- ============================================================== -->
   <div id="authGate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070b14]/95 backdrop-blur-xl">
     <div class="glass-card max-w-md w-full p-8 rounded-3xl relative overflow-hidden border border-white/10 shadow-2xl shadow-cyan-500/10">
-      <!-- Glow ambient behind card -->
       <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- Header & Logo -->
       <div class="text-center mb-8 relative">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 text-cyan-400 mb-4 shadow-lg shadow-cyan-500/20">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,6 @@
         <p class="text-xs text-slate-400 mt-1">لوحة الأدمن المشفرة للتحكم السحابي عن بُعد</p>
       </div>
 
-      <!-- Login Form -->
       <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4 relative">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">البريد الإلكتروني للأدمن</label>
@@ -191,34 +190,29 @@
     <!-- Top Navigation Header -->
     <header class="glass-card sticky top-0 z-40 border-b border-white/10 px-4 sm:px-6 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <!-- Brand Shield Icon -->
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-500/10">
           <i class="fa-solid fa-shield-halved text-sm"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-sm sm:text-base font-extrabold text-white tracking-wide">BioCraft Central</h1>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 font-bold">Admin v2.0</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 font-bold">Admin v2.5</span>
           </div>
-          <p class="text-[10px] text-slate-400 hidden sm:block">لوحة التحكم المشفرة لإدارة منصة البطاقات الرقمية</p>
+          <p class="text-[10px] text-slate-400 hidden sm:block">لوحة التحكم المشفرة لإدارة منصة البطاقات الرقمية وميزات VIP</p>
         </div>
       </div>
 
-      <!-- Action items -->
       <div class="flex items-center gap-3">
-        <!-- Live status indicator -->
         <div id="dbStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span id="dbStatusText">متصل بالسحابة</span>
         </div>
 
-        <!-- Open Public Platform Button -->
         <a id="publicPlatformLink" href="https://1234567890vi.github.io/linkbio-generator" target="_blank" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors flex items-center gap-1.5">
           <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
           <span class="hidden md:inline">فتح المنصة العامة</span>
         </a>
 
-        <!-- Sign Out Button -->
         <button onclick="handleSignOut()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 transition-colors flex items-center gap-1.5">
           <i class="fa-solid fa-right-from-bracket text-xs"></i>
           <span>خروج</span>
@@ -230,9 +224,9 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
       <!-- ============================================================== -->
-      <!-- SECTION 1: 4 TOP KPI CARDS (بطاقات المؤشرات الرقمية الرئيسية) -->
+      <!-- SECTION 1: 5 TOP KPI CARDS (المؤشرات الرقمية ومواقع الـ VIP) -->
       <!-- ============================================================== -->
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- KPI 1: Total Sites -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-cyan-400/30 transition-colors">
           <div class="flex items-center justify-between mb-3">
@@ -243,86 +237,97 @@
           </div>
           <div class="flex items-baseline gap-2">
             <span id="kpiTotalSites" class="text-2xl sm:text-3xl font-black text-white font-mono">0</span>
-            <span class="text-[10px] text-cyan-400 font-semibold">موقعاً مسجلاً</span>
+            <span class="text-[10px] text-cyan-400 font-semibold">موقعاً</span>
           </div>
           <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
             <i class="fa-solid fa-arrow-trend-up text-emerald-400"></i>
-            <span>تحديث فوري من قاعدة البيانات</span>
+            <span>تحديث فوري من Supabase</span>
           </div>
         </div>
 
         <!-- KPI 2: Total Platform Views -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-blue-400/30 transition-colors">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-slate-400">إجمالي الزيارات عبر المنصة</span>
+            <span class="text-xs font-semibold text-slate-400">إجمالي الزيارات</span>
             <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-400/20 text-blue-400 flex items-center justify-center text-xs">
               <i class="fa-solid fa-chart-line"></i>
             </div>
           </div>
           <div class="flex items-baseline gap-2">
             <span id="kpiTotalViews" class="text-2xl sm:text-3xl font-black text-white font-mono">0</span>
-            <span class="text-[10px] text-blue-400 font-semibold">مشاهدة حقيقية</span>
+            <span class="text-[10px] text-blue-400 font-semibold">مشاهدة</span>
           </div>
           <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
             <i class="fa-solid fa-bolt text-amber-400"></i>
-            <span>معدودة عبر دالة RPC الآمنة</span>
+            <span>دالة RPC السحابية</span>
           </div>
         </div>
 
         <!-- KPI 3: Active vs Suspended -->
         <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-400/30 transition-colors">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-slate-400">حالة المواقع (نشطة / موقوفة)</span>
+            <span class="text-xs font-semibold text-slate-400">نشطة / موقوفة</span>
             <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-400/20 text-emerald-400 flex items-center justify-center text-xs">
               <i class="fa-solid fa-toggle-on"></i>
             </div>
           </div>
-          <div class="flex items-baseline gap-3">
-            <div class="flex items-baseline gap-1">
-              <span id="kpiActiveSites" class="text-2xl font-black text-emerald-400 font-mono">0</span>
-              <span class="text-[10px] text-slate-400">نشط</span>
-            </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiActiveSites" class="text-2xl font-black text-emerald-400 font-mono">0</span>
             <span class="text-slate-600">/</span>
-            <div class="flex items-baseline gap-1">
-              <span id="kpiSuspendedSites" class="text-2xl font-black text-rose-400 font-mono">0</span>
-              <span class="text-[10px] text-slate-400">موقوف</span>
-            </div>
+            <span id="kpiSuspendedSites" class="text-2xl font-black text-rose-400 font-mono">0</span>
           </div>
           <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
             <i class="fa-solid fa-sliders text-cyan-400"></i>
-            <span>تحكم مباشر بزر تفعيل واحد</span>
+            <span>تحكم فوري بحالة الحساب</span>
           </div>
         </div>
 
         <!-- KPI 4: Verified Sites -->
-        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-amber-400/30 transition-colors">
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-sky-400/30 transition-colors">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-slate-400">المواقع الموثّقة بالشارة</span>
+            <span class="text-xs font-semibold text-slate-400">المواقع الموثقة</span>
             <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-400/20 text-sky-400 flex items-center justify-center text-xs">
               <i class="fa-solid fa-circle-check"></i>
             </div>
           </div>
           <div class="flex items-baseline gap-2">
             <span id="kpiVerifiedSites" class="text-2xl sm:text-3xl font-black text-sky-400 font-mono">0</span>
-            <span class="text-[10px] text-slate-400 font-semibold">حسابات رسمية</span>
+            <span class="text-[10px] text-slate-400 font-semibold">حسابات</span>
           </div>
           <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
             <i class="fa-solid fa-award text-sky-400"></i>
-            <span>شارة التوثيق الزرقاء الحصرية</span>
+            <span>شارة التوثيق الزرقاء</span>
+          </div>
+        </div>
+
+        <!-- KPI 5: VIP Creators -->
+        <div class="glass-card p-5 rounded-2xl relative overflow-hidden group hover:border-amber-400/30 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-slate-400">مواقع VIP الذهبية</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-400/20 text-amber-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiVipSites" class="text-2xl sm:text-3xl font-black text-amber-400 font-mono">0</span>
+            <span class="text-[10px] text-amber-400/80 font-semibold">حساب VIP</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
+            <i class="fa-solid fa-gem text-amber-400"></i>
+            <span>ميزات حصرية وتصميم خاص</span>
           </div>
         </div>
       </section>
 
       <!-- ============================================================== -->
-      <!-- SECTION 2: ANALYTICS CHARTS (الرسوم البيانية التفاعلية عبر Chart.js) -->
+      <!-- SECTION 2: ANALYTICS CHARTS (الرسوم البيانية التفاعلية) -->
       <!-- ============================================================== -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Chart 1: Top Visited Sites -->
         <div class="glass-card p-5 sm:p-6 rounded-2xl">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-chart-simple text-cyan-400 text-sm"></i>
-              <h2 class="text-sm font-bold text-white">أكثر 10 مواقع زيارةً على المنصة</h2>
+              <h2 class="text-sm font-bold text-white">أكثر المواقع زيارةً على المنصة</h2>
             </div>
             <span class="text-[11px] text-slate-400 font-mono">Top Traffic</span>
           </div>
@@ -331,7 +336,6 @@
           </div>
         </div>
 
-        <!-- Chart 2: Recent Growth Trend -->
         <div class="glass-card p-5 sm:p-6 rounded-2xl">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
@@ -347,24 +351,21 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- SECTION 3: SITES MANAGEMENT TABLE (جدول إدارة المواقع الاحترافي) -->
+      <!-- SECTION 3: SITES MANAGEMENT TABLE (جدول إدارة المواقع وميزات VIP) -->
       <!-- ============================================================== -->
       <section class="glass-card rounded-2xl overflow-hidden border border-white/10">
-        <!-- Table Header & Controls -->
         <div class="p-4 sm:p-5 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-400/20 text-cyan-400 flex items-center justify-center text-xs">
               <i class="fa-solid fa-table-list"></i>
             </div>
             <div>
-              <h2 class="text-sm font-bold text-white">قائمة المواقع والبطاقات الرقمية</h2>
-              <p class="text-[11px] text-slate-400">إدارة وتعديل وتوثيق المواقع عن بُعد</p>
+              <h2 class="text-sm font-bold text-white">إدارة المواقع والبطاقات الرقمية</h2>
+              <p class="text-[11px] text-slate-400">التحكم في التوثيق، ميزات VIP، والإيقاف والتعديل</p>
             </div>
           </div>
 
-          <!-- Filters & Search -->
           <div class="flex flex-wrap items-center gap-2.5">
-            <!-- Search Box -->
             <div class="relative flex-1 sm:w-64">
               <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500 text-xs">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -372,22 +373,20 @@
               <input type="text" id="tableSearchInput" oninput="handleTableSearch()" class="glass-input w-full pr-8 pl-3 py-1.5 rounded-xl text-xs" placeholder="بحث بالاسم أو الرابط..." />
             </div>
 
-            <!-- Filter Pills -->
             <div class="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 text-[11px]">
               <button onclick="setTableFilter('all')" id="filterBtn-all" class="px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition-colors">الكل</button>
+              <button onclick="setTableFilter('vip')" id="filterBtn-vip" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">VIP</button>
+              <button onclick="setTableFilter('verified')" id="filterBtn-verified" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">الموثقة</button>
               <button onclick="setTableFilter('active')" id="filterBtn-active" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">النشطة</button>
               <button onclick="setTableFilter('suspended')" id="filterBtn-suspended" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">الموقوفة</button>
-              <button onclick="setTableFilter('verified')" id="filterBtn-verified" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white transition-colors">الموثقة</button>
             </div>
 
-            <!-- Refresh Button -->
             <button onclick="loadDashboardData()" title="تحديث البيانات" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-cyan-400 transition-colors">
               <i class="fa-solid fa-arrows-rotate text-xs"></i>
             </button>
           </div>
         </div>
 
-        <!-- Table View -->
         <div class="overflow-x-auto">
           <table class="w-full text-right text-xs">
             <thead class="bg-white/[0.02] border-b border-white/5 text-slate-400 font-semibold text-[11px]">
@@ -396,18 +395,17 @@
                 <th class="py-3 px-4">الرابط السحابي</th>
                 <th class="py-3 px-4">القالب</th>
                 <th class="py-3 px-4">الزيارات</th>
-                <th class="py-3 px-4">توثيق (Verified)</th>
+                <th class="py-3 px-4">ترقية VIP</th>
+                <th class="py-3 px-4">شارة التوثيق</th>
                 <th class="py-3 px-4">الحالة (Active)</th>
                 <th class="py-3 px-4 text-center">إجراءات</th>
               </tr>
             </thead>
             <tbody id="sitesTableBody" class="divide-y divide-white/5">
-              <!-- Rendered Dynamically -->
             </tbody>
           </table>
         </div>
 
-        <!-- Empty State (hidden by default) -->
         <div id="tableEmptyState" class="hidden p-12 text-center text-slate-400">
           <div class="w-12 h-12 mx-auto rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 mb-3">
             <i class="fa-solid fa-folder-open text-xl"></i>
@@ -418,10 +416,47 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- SECTION 4: PLATFORM REMOTE SETTINGS & BACKUPS (إعدادات المنصة العامة) -->
+      <!-- SECTION 4: VIP CODES GENERATOR & MANAGEMENT (أكواد الـ VIP) -->
+      <!-- ============================================================== -->
+      <section class="glass-card rounded-2xl overflow-hidden border border-amber-500/20">
+        <div class="p-4 sm:p-5 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-500/[0.03] to-transparent">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-400/20 text-amber-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-white">إدارة وتوليد أكواد الـ VIP الحصرية (vip_codes)</h2>
+              <p class="text-[11px] text-slate-400">توليد أكواد تمنح المستخدمين ميزات VIP وشارة التوثيق تلقائياً</p>
+            </div>
+          </div>
+          <button onclick="handleGenerateVipCode()" class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:brightness-110 active:scale-95 transition-all shadow-md shadow-amber-500/15 flex items-center gap-1.5 self-start sm:self-auto">
+            <i class="fa-solid fa-plus"></i>
+            <span>توليد كود VIP جديد</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-white/[0.02] border-b border-white/5 text-slate-400 font-semibold text-[11px]">
+              <tr>
+                <th class="py-3 px-4">كود الـ VIP</th>
+                <th class="py-3 px-4">الفئة (Tier)</th>
+                <th class="py-3 px-4">الحالة</th>
+                <th class="py-3 px-4">المستخدم المستفيد</th>
+                <th class="py-3 px-4">تاريخ الإنشاء</th>
+                <th class="py-3 px-4 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="vipCodesTableBody" class="divide-y divide-white/5">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SECTION 5: PLATFORM REMOTE SETTINGS & BACKUPS (إعدادات المنصة) -->
       <!-- ============================================================== -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Settings Form (2 columns) -->
         <div class="lg:col-span-2 glass-card p-5 sm:p-6 rounded-2xl">
           <div class="flex items-center gap-2 mb-4">
             <i class="fa-solid fa-sliders text-cyan-400 text-sm"></i>
@@ -429,9 +464,7 @@
           </div>
 
           <form onsubmit="handleSaveSettings(event)" class="space-y-4">
-            <!-- Switches Row -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-              <!-- Maintenance Mode -->
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-xs font-bold text-slate-200">وضع الصيانة (Maintenance Mode)</h3>
@@ -445,7 +478,6 @@
                 </label>
               </div>
 
-              <!-- Allow New Registrations -->
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-xs font-bold text-slate-200">السماح بإنشاء مواقع جديدة</h3>
@@ -460,7 +492,6 @@
               </div>
             </div>
 
-            <!-- Announcement Bar -->
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">
                 شريط الإعلان العلوي للمنصة العامة (اتركه فارغاً لإخفائه)
@@ -473,7 +504,6 @@
               </div>
             </div>
 
-            <!-- Default Theme -->
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">القالب الافتراضي للمستخدمين الجدد</label>
               <select id="settingDefaultTheme" class="glass-input w-full py-2 px-3 rounded-xl text-xs cursor-pointer bg-slate-900">
@@ -492,7 +522,6 @@
           </form>
         </div>
 
-        <!-- Backup & Quick Tools (1 column) -->
         <div class="glass-card p-5 sm:p-6 rounded-2xl flex flex-col justify-between">
           <div>
             <div class="flex items-center gap-2 mb-4">
@@ -500,7 +529,7 @@
               <h2 class="text-sm font-bold text-white">النسخ الاحتياطي وتصدير البيانات</h2>
             </div>
             <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-              قم بتنزيل نسخة كاملة من جميع بيانات المواقع والروابط للاحتفاظ بها كنسخة احتياطية أو تحليلها في Excel.
+              قم بتنزيل نسخة كاملة من جميع بيانات المواقع وأكواد VIP والروابط للاحتفاظ بها كنسخة احتياطية أو تحليلها في Excel.
             </p>
           </div>
 
@@ -525,9 +554,7 @@
     </footer>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- 3. EDIT PROFILE MODAL (نافذة تعديل بيانات أي موقع) -->
-  <!-- ============================================================== -->
+  <!-- EDIT MODAL -->
   <div id="editModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
     <div class="glass-card max-w-lg w-full p-6 rounded-3xl border border-white/10 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
@@ -577,9 +604,7 @@
     </div>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- 4. DELETE CONFIRMATION MODAL (نافذة تأكيد الحذف النهائي) -->
-  <!-- ============================================================== -->
+  <!-- DELETE MODAL -->
   <div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
     <div class="glass-card max-w-sm w-full p-6 rounded-3xl border border-rose-500/20 shadow-2xl relative text-center">
       <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-lg mx-auto mb-3">
@@ -587,7 +612,7 @@
       </div>
       <h3 class="text-sm font-bold text-white mb-1">تأكيد حذف الموقع نهائياً؟</h3>
       <p class="text-xs text-slate-400 mb-4">
-        سيتم حذف الموقع <span id="deleteModalTargetSlug" class="font-bold text-rose-400 font-mono"></span> بشكل نهائي من قاعدة البيانات ولا يمكن التراجع عن هذا الإجراء.
+        سيتم حذف الموقع <span id="deleteModalTargetSlug" class="font-bold text-rose-400 font-mono"></span> بشكل نهائي من قاعدة البيانات ولا يمكن التراجع.
       </p>
 
       <div class="flex items-center justify-center gap-2">
@@ -597,30 +622,24 @@
     </div>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- 5. FLOATING TOAST NOTIFICATION (إشعار منبثق فخم وسلس) -->
-  <!-- ============================================================== -->
+  <!-- TOAST -->
   <div id="adminToast" class="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-900/90 border border-cyan-400/30 text-white shadow-xl shadow-cyan-500/10 text-xs">
     <i class="fa-solid fa-circle-check text-cyan-400"></i>
     <span id="toastMessage">تم الحفظ بنجاح</span>
   </div>
 
-  <!-- Load Supabase Config script -->
   <script src="./supabase-config.js"></script>
 
-  <!-- ============================================================== -->
-  <!-- MAIN CONTROLLER SCRIPT -->
-  <!-- ============================================================== -->
   <script>
     let currentProfilesData = [];
     let currentSettingsData = {};
+    let currentVipCodesData = [];
     let activeFilter = 'all';
     let searchQuery = '';
     let topSitesChartInstance = null;
     let growthTrendChartInstance = null;
     let pendingDeleteSlug = null;
 
-    // Toast helper
     function showToast(msg) {
       const toast = document.getElementById('adminToast');
       document.getElementById('toastMessage').textContent = msg;
@@ -628,9 +647,6 @@
       setTimeout(() => toast.classList.remove('show'), 2400);
     }
 
-    // ==========================================
-    // AUTHENTICATION LOGIC
-    // ==========================================
     async function checkAuthOnStartup() {
       const user = await checkAdminSession();
       if (user) {
@@ -672,7 +688,6 @@
       document.getElementById('authGate').classList.add('hidden');
       document.getElementById('mainDashboard').classList.remove('hidden');
 
-      // Update Public Platform link
       if (typeof PUBLIC_PLATFORM_URL !== 'undefined') {
         document.getElementById('publicPlatformLink').href = PUBLIC_PLATFORM_URL;
       }
@@ -687,15 +702,12 @@
       }
     }
 
-    // ==========================================
-    // DATA FETCHING & UI RENDERING
-    // ==========================================
     async function loadDashboardData() {
       const result = await fetchDashboardData();
       currentProfilesData = result.profiles || [];
       currentSettingsData = result.settings || {};
+      currentVipCodesData = result.vipCodes || [];
 
-      // DB Status Badge
       const statusBadge = document.getElementById('dbStatusBadge');
       const statusText = document.getElementById('dbStatusText');
       if (result.isLiveSupabase) {
@@ -709,6 +721,7 @@
       updateKPICards();
       renderAnalyticsCharts();
       renderSitesTable();
+      renderVipCodesTable();
       populateSettingsForm();
     }
 
@@ -718,23 +731,21 @@
       const active = currentProfilesData.filter(p => p.is_active !== false).length;
       const suspended = total - active;
       const verified = currentProfilesData.filter(p => Boolean(p.verified)).length;
+      const vip = currentProfilesData.filter(p => Boolean(p.is_vip)).length;
 
       document.getElementById('kpiTotalSites').textContent = total.toLocaleString();
       document.getElementById('kpiTotalViews').textContent = views.toLocaleString();
       document.getElementById('kpiActiveSites').textContent = active.toLocaleString();
       document.getElementById('kpiSuspendedSites').textContent = suspended.toLocaleString();
       document.getElementById('kpiVerifiedSites').textContent = verified.toLocaleString();
+      document.getElementById('kpiVipSites').textContent = vip.toLocaleString();
     }
 
-    // ==========================================
-    // CHARTS RENDERING (Chart.js)
-    // ==========================================
     function renderAnalyticsCharts() {
       const top10 = [...currentProfilesData]
         .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
         .slice(0, 10);
 
-      // 1. Top Sites Chart
       const ctx1 = document.getElementById('topSitesChart').getContext('2d');
       if (topSitesChartInstance) topSitesChartInstance.destroy();
 
@@ -754,9 +765,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
               grid: { color: 'rgba(255, 255, 255, 0.05)' },
@@ -770,11 +779,9 @@
         }
       });
 
-      // 2. 7-Day Growth Trend Chart
       const ctx2 = document.getElementById('growthTrendChart').getContext('2d');
       if (growthTrendChartInstance) growthTrendChartInstance.destroy();
 
-      // Generate last 7 days labels
       const days = [];
       const counts = [0, 0, 0, 0, 0, 0, 0];
       for (let i = 6; i >= 0; i--) {
@@ -809,9 +816,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
               grid: { color: 'rgba(255, 255, 255, 0.05)' },
@@ -827,13 +832,11 @@
       });
     }
 
-    // ==========================================
-    // SITES TABLE CONTROLS & RENDERING
-    // ==========================================
     function setTableFilter(filter) {
       activeFilter = filter;
-      ['all', 'active', 'suspended', 'verified'].forEach(f => {
+      ['all', 'vip', 'verified', 'active', 'suspended'].forEach(f => {
         const btn = document.getElementById(`filterBtn-${f}`);
+        if (!btn) return;
         if (f === filter) {
           btn.className = 'px-2.5 py-1 rounded-lg font-bold bg-cyan-500 text-slate-950 transition-colors';
         } else {
@@ -861,9 +864,10 @@
 
         if (!matchesSearch) return false;
 
+        if (activeFilter === 'vip') return Boolean(p.is_vip);
+        if (activeFilter === 'verified') return Boolean(p.verified);
         if (activeFilter === 'active') return p.is_active !== false;
         if (activeFilter === 'suspended') return p.is_active === false;
-        if (activeFilter === 'verified') return Boolean(p.verified);
         return true;
       });
 
@@ -877,7 +881,6 @@
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-white/[0.02] transition-colors';
 
-        // Public live URL
         const siteUrl = `${PUBLIC_PLATFORM_URL}/view.html?slug=${p.slug}`;
         const avatarSrc = p.avatar_data || 'https://via.placeholder.com/64/070b14/00f2fe?text=Avatar';
 
@@ -890,21 +893,20 @@
         };
 
         tr.innerHTML = `
-          <!-- Name & Avatar -->
           <td class="py-3 px-4">
             <div class="flex items-center gap-3">
               <img src="${avatarSrc}" onerror="this.src='https://via.placeholder.com/64/070b14/00f2fe?text=Bio'" class="w-8 h-8 rounded-full object-cover border border-cyan-400/30 flex-shrink-0" />
               <div>
-                <div class="font-bold text-white flex items-center gap-1.5">
+                <div class="font-bold text-white flex items-center gap-1.5 flex-wrap">
                   <span>${escapeHtml(p.display_name || 'بدون اسم')}</span>
                   ${p.verified ? '<i class="fa-solid fa-circle-check text-sky-400 text-xs" title="موثق"></i>' : ''}
+                  ${p.is_vip ? '<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300 inline-flex items-center gap-1"><i class="fa-solid fa-crown text-[8px]"></i> VIP</span>' : ''}
                 </div>
                 <div class="text-[10px] text-slate-400 truncate max-w-[160px]">${escapeHtml(p.bio || p.site_title || '')}</div>
               </div>
             </div>
           </td>
 
-          <!-- Short Slug & Link -->
           <td class="py-3 px-4">
             <div class="flex items-center gap-1.5 font-mono text-cyan-300">
               <span class="text-slate-500">/u/</span>
@@ -915,14 +917,12 @@
             </div>
           </td>
 
-          <!-- Theme -->
           <td class="py-3 px-4">
             <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/5 border border-white/10 text-slate-300">
               ${themeLabels[p.theme] || p.theme || 'Obsidian'}
             </span>
           </td>
 
-          <!-- Views Count -->
           <td class="py-3 px-4 font-mono font-bold text-slate-200">
             <div class="flex items-center gap-1">
               <i class="fa-regular fa-eye text-slate-500 text-[10px]"></i>
@@ -930,9 +930,19 @@
             </div>
           </td>
 
+          <!-- VIP Switch -->
+          <td class="py-3 px-4">
+            <label class="relative inline-flex items-center cursor-pointer" title="تبديل ميزة VIP">
+              <input type="checkbox" ${p.is_vip ? 'checked' : ''} onchange="handleToggleVip('${p.slug}', ${Boolean(p.is_vip)})" class="sr-only badge-vip-toggle" />
+              <div class="vip-label w-9 h-5 bg-slate-700 rounded-full transition-colors">
+                <div class="vip-dot w-3 h-3 bg-white rounded-full transition-transform m-1"></div>
+              </div>
+            </label>
+          </td>
+
           <!-- Verified Switch -->
           <td class="py-3 px-4">
-            <label class="relative inline-flex items-center cursor-pointer">
+            <label class="relative inline-flex items-center cursor-pointer" title="تبديل التوثيق">
               <input type="checkbox" ${p.verified ? 'checked' : ''} onchange="handleToggleVerified('${p.slug}', ${Boolean(p.verified)})" class="sr-only badge-verified-toggle" />
               <div class="verified-label w-9 h-5 bg-slate-700 rounded-full transition-colors">
                 <div class="verified-dot w-3 h-3 bg-white rounded-full transition-transform m-1"></div>
@@ -942,7 +952,7 @@
 
           <!-- Active Switch -->
           <td class="py-3 px-4">
-            <label class="relative inline-flex items-center cursor-pointer">
+            <label class="relative inline-flex items-center cursor-pointer" title="تفعيل / إيقاف">
               <input type="checkbox" ${p.is_active !== false ? 'checked' : ''} onchange="handleToggleActive('${p.slug}', ${p.is_active !== false})" class="sr-only switch-checkbox" />
               <div class="switch-label w-9 h-5 bg-slate-700 rounded-full transition-colors">
                 <div class="switch-dot w-3 h-3 bg-white rounded-full transition-transform m-1"></div>
@@ -950,7 +960,6 @@
             </label>
           </td>
 
-          <!-- Actions -->
           <td class="py-3 px-4 text-center">
             <div class="inline-flex items-center gap-1">
               <button onclick="openEditModal('${p.slug}')" title="تعديل" class="p-1.5 rounded-lg bg-white/5 hover:bg-cyan-500/10 hover:text-cyan-400 text-slate-400 transition-colors">
@@ -966,9 +975,93 @@
       });
     }
 
-    // ==========================================
-    // TOGGLES (VERIFIED & ACTIVE)
-    // ==========================================
+    // Render VIP Codes Table
+    function renderVipCodesTable() {
+      const tbody = document.getElementById('vipCodesTableBody');
+      tbody.innerHTML = '';
+
+      if (currentVipCodesData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs">لا توجد أكواد VIP مولّدة بعد. اضغط "توليد كود VIP جديد" بالأعلى لإنشاء كود فوري.</td></tr>`;
+        return;
+      }
+
+      currentVipCodesData.forEach(codeObj => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-white/[0.02] transition-colors';
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-amber-300">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-key text-[10px] text-amber-400"></i>
+              <span>${codeObj.code}</span>
+              <button onclick="copyCodeText('${codeObj.code}')" class="p-1 text-slate-400 hover:text-amber-300 transition-colors" title="نسخ الكود">
+                <i class="fa-regular fa-copy text-xs"></i>
+              </button>
+            </div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-300">
+              ${codeObj.tier || 'vip_pro'}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            ${codeObj.is_used 
+              ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-500/10 border border-slate-500/20 text-slate-400">تم استخدامه</span>' 
+              : '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 animate-pulse">متاح للاستخدام</span>'}
+          </td>
+          <td class="py-3 px-4 font-mono text-slate-300">
+            ${codeObj.used_by_slug ? `<span class="text-cyan-400">/u/${codeObj.used_by_slug}</span>` : '<span class="text-slate-600">—</span>'}
+          </td>
+          <td class="py-3 px-4 text-[10px] text-slate-400 font-mono">
+            ${codeObj.created_at ? new Date(codeObj.created_at).toLocaleDateString('ar-DZ') : 'الآن'}
+          </td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="handleDeleteVipCode('${codeObj.id}')" title="حذف الكود" class="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/10 hover:text-rose-400 text-slate-400 transition-colors">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function handleGenerateVipCode() {
+      try {
+        const newCode = await generateVipCodeRemote('vip_pro');
+        showToast(`تم توليد كود VIP جديد: ${newCode.code}`);
+        loadDashboardData();
+      } catch (err) {
+        alert('تعذر توليد كود VIP: ' + err.message);
+      }
+    }
+
+    async function handleDeleteVipCode(id) {
+      if (!confirm('هل ترغب في حذف هذا الكود؟')) return;
+      try {
+        await deleteVipCodeRemote(id);
+        showToast('تم حذف كود VIP');
+        loadDashboardData();
+      } catch (err) {
+        alert('تعذر حذف الكود: ' + err.message);
+      }
+    }
+
+    function copyCodeText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('تم نسخ كود VIP إلى الحافظة!');
+      });
+    }
+
+    async function handleToggleVip(slug, currentVal) {
+      try {
+        const next = await toggleProfileVipStatus(slug, currentVal);
+        showToast(next ? `تمت ترقية (${slug}) إلى VIP وتوثيقه!` : `تم سحب ميزات VIP من (${slug})`);
+        loadDashboardData();
+      } catch (err) {
+        alert('تعذر تحديث حالة VIP: ' + err.message);
+      }
+    }
+
     async function handleToggleVerified(slug, currentVal) {
       try {
         const next = await toggleProfileVerification(slug, currentVal);
@@ -989,9 +1082,6 @@
       }
     }
 
-    // ==========================================
-    // EDIT MODAL LOGIC
-    // ==========================================
     function openEditModal(slug) {
       const p = currentProfilesData.find(x => x.slug === slug);
       if (!p) return;
@@ -1029,9 +1119,6 @@
       }
     }
 
-    // ==========================================
-    // DELETE MODAL LOGIC
-    // ==========================================
     function openDeleteModal(slug) {
       pendingDeleteSlug = slug;
       document.getElementById('deleteModalTargetSlug').textContent = slug;
@@ -1055,9 +1142,6 @@
       }
     }
 
-    // ==========================================
-    // PLATFORM SETTINGS LOGIC
-    // ==========================================
     function populateSettingsForm() {
       document.getElementById('settingMaintenance').checked = Boolean(currentSettingsData.maintenance_mode);
       document.getElementById('settingAllowSites').checked = currentSettingsData.allow_new_sites !== false;
@@ -1082,14 +1166,12 @@
       }
     }
 
-    // ==========================================
-    // BACKUP & EXPORTS (JSON & CSV)
-    // ==========================================
     function exportBackupJSON() {
       const exportData = {
         exported_at: new Date().toISOString(),
         total_profiles: currentProfilesData.length,
         platform_settings: currentSettingsData,
+        vip_codes: currentVipCodesData,
         profiles: currentProfilesData
       };
 
@@ -1099,12 +1181,13 @@
     }
 
     function exportBackupCSV() {
-      const headers = ['Slug', 'Display Name', 'Site Title', 'Views', 'Verified', 'Active', 'Theme', 'Created At'];
+      const headers = ['Slug', 'Display Name', 'Site Title', 'Views', 'VIP', 'Verified', 'Active', 'Theme', 'Created At'];
       const rows = currentProfilesData.map(p => [
         `"${p.slug || ''}"`,
         `"${(p.display_name || '').replace(/"/g, '""')}"`,
         `"${(p.site_title || '').replace(/"/g, '""')}"`,
         p.views_count || 0,
+        p.is_vip ? 'YES' : 'NO',
         p.verified ? 'YES' : 'NO',
         p.is_active !== false ? 'ACTIVE' : 'SUSPENDED',
         `"${p.theme || 'obsidian'}"`,
@@ -1139,7 +1222,6 @@
       })[m]);
     }
 
-    // Startup check
     window.addEventListener('DOMContentLoaded', checkAuthOnStartup);
   </script>
 </body>

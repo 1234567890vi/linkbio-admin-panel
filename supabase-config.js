@@ -1,6 +1,6 @@
 /**
  * ====================================================================
- *   BioCraft Admin Dashboard — Supabase & Platform Remote Configuration
+ *   BioCraft Admin Dashboard — Supabase Master Configuration
  * ====================================================================
  * ضع إعدادات مشروع Supabase الخاص بك هنا للاتصال المباشر بقاعدة البيانات:
  */
@@ -10,7 +10,7 @@ const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const PUBLIC_PLATFORM_URL = 'https://1234567890vi.github.io/linkbio-generator';
 
 // ====================================================================
-// Mock / Demo Data Store (لتجربة لوحة التحكم فوراً وبشكل تفاعلي كامل)
+// Mock / Fallback Store (للعمل التلقائي الفوري لحين حقن مفاتيح Supabase)
 // ====================================================================
 let mockProfiles = [
   {
@@ -23,6 +23,8 @@ let mockProfiles = [
     theme: "obsidian",
     bg_style: "particles",
     verified: true,
+    is_vip: true,
+    vip_badge: "VIP CREATOR",
     is_active: true,
     views_count: 1420,
     created_at: new Date(Date.now() - 6 * 86400000).toISOString(),
@@ -43,13 +45,12 @@ let mockProfiles = [
     theme: "royal",
     bg_style: "mesh",
     verified: true,
+    is_vip: false,
+    vip_badge: null,
     is_active: true,
     views_count: 890,
     created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-    links_json: [
-      { id: 1, platform: "github", value: "samir-dev", customTitle: "GitHub" },
-      { id: 2, platform: "linkedin", value: "samir-othmani", customTitle: "LinkedIn" }
-    ]
+    links_json: []
   },
   {
     id: "3",
@@ -61,74 +62,28 @@ let mockProfiles = [
     theme: "cyber",
     bg_style: "particles",
     verified: false,
+    is_vip: true,
+    vip_badge: "VIP DESIGNER",
     is_active: true,
     views_count: 654,
     created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
-    links_json: [
-      { id: 1, platform: "behance", value: "nour_designs", customTitle: "Behance" },
-      { id: 2, platform: "instagram", value: "nour.gfx", customTitle: "Instagram" }
-    ]
-  },
-  {
-    id: "4",
-    slug: "yasmina-beauty",
-    site_title: "صالون ياسمينة للتجميل",
-    display_name: "ياسمينة بيوتي",
-    bio: "عالم الأناقة والمكياج العصري",
-    avatar_data: "",
-    theme: "emerald",
-    bg_style: "clean",
-    verified: false,
-    is_active: false,
-    views_count: 320,
-    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-    links_json: [
-      { id: 1, platform: "tiktok", value: "yasmina_beauty", customTitle: "TikTok" }
-    ]
-  },
-  {
-    id: "5",
-    slug: "karim-fitness",
-    site_title: "كوتش كريم | تدريب شخصي",
-    display_name: "كريم بوزيد",
-    bio: "مدرب لياقة بدنية وتغذية رياضية معتمد",
-    avatar_data: "",
-    theme: "obsidian",
-    bg_style: "particles",
-    verified: true,
-    is_active: true,
-    views_count: 1105,
-    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    links_json: [
-      { id: 1, platform: "youtube", value: "@karim_fit", customTitle: "YouTube" },
-      { id: 2, platform: "instagram", value: "karim_fitness_dz", customTitle: "Instagram" }
-    ]
-  },
-  {
-    id: "6",
-    slug: "amina-books",
-    site_title: "أمينة | مراجعات كتب وروايات",
-    display_name: "أمينة قدوري",
-    bio: "شغوفة بالقراءة وتلخيص أحدث الروايات العالمية",
-    avatar_data: "",
-    theme: "minimal",
-    bg_style: "clean",
-    verified: false,
-    is_active: true,
-    views_count: 412,
-    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
-    links_json: [
-      { id: 1, platform: "twitter", value: "amina_reads", customTitle: "X (Twitter)" }
-    ]
+    links_json: []
   }
 ];
 
 let mockSettings = {
   maintenance_mode: false,
   allow_new_sites: true,
-  announcement_text: "مرحباً بكم في منصة BioCraft — أصدرنا قوالب جديدة فائقة الفخامة!",
+  announcement_text: "مرحباً بكم في منصة BioCraft — أصدرنا قوالب جديدة وميزات VIP متقدمة!",
+  announcement_type: "info",
   default_theme: "obsidian"
 };
+
+let mockVipCodes = [
+  { id: "1", code: "VIP-2026-GOLD", tier: "vip_pro", is_active: true, is_used: true, used_by_slug: "abdeljalil", created_at: new Date().toISOString() },
+  { id: "2", code: "VIP-9944-DIAMOND", tier: "vip_pro", is_active: true, is_used: false, used_by_slug: null, created_at: new Date().toISOString() },
+  { id: "3", code: "VIP-7712-CREATOR", tier: "vip_pro", is_active: true, is_used: false, used_by_slug: null, created_at: new Date().toISOString() }
+];
 
 // ====================================================================
 // Supabase Client Helper Functions
@@ -182,7 +137,6 @@ async function checkAdminSession() {
     }
   }
 
-  // Check Demo / Local session
   const localSession = sessionStorage.getItem('biocraft_admin_session');
   if (localSession) {
     try {
@@ -206,7 +160,7 @@ async function adminSignIn(email, password) {
     return currentAdminUser;
   }
 
-  // Fallback / Demo Login Mode
+  // Fallback demo login
   if (email.toLowerCase().includes('admin') || password.length >= 6) {
     currentAdminUser = {
       id: 'admin-local-1',
@@ -232,44 +186,35 @@ async function adminSignOut() {
   sessionStorage.removeItem('biocraft_admin_session');
 }
 
-// Data Fetchers & Controllers
-
+// Fetch Master Dashboard Data
 async function fetchDashboardData() {
   const client = getSupabaseClient();
 
   if (client) {
     try {
-      // 1. Fetch profiles
-      const { data: profiles, error: pErr } = await client
-        .from('profiles')
-        .select('*')
-        .order('views_count', { ascending: false });
+      const [pRes, sRes, vRes] = await Promise.all([
+        client.from('profiles').select('*').order('views_count', { ascending: false }),
+        client.from('platform_settings').select('*').eq('id', 1).maybeSingle(),
+        client.from('vip_codes').select('*').order('created_at', { ascending: false })
+      ]);
 
-      if (pErr) throw pErr;
-
-      // 2. Fetch settings
-      const { data: settings, error: sErr } = await client
-        .from('platform_settings')
-        .select('*')
-        .eq('id', 1)
-        .maybeSingle();
-
-      if (sErr) throw sErr;
+      if (pRes.error) throw pRes.error;
 
       return {
-        profiles: profiles || [],
-        settings: settings || mockSettings,
+        profiles: pRes.data || [],
+        settings: sRes.data || mockSettings,
+        vipCodes: vRes.data || [],
         isLiveSupabase: true
       };
     } catch (err) {
-      console.warn('Supabase fetch failed, falling back to mock data:', err);
+      console.warn('Supabase fetch failed, falling back to mock store:', err);
     }
   }
 
-  // Return Mock Data
   return {
     profiles: [...mockProfiles],
     settings: { ...mockSettings },
+    vipCodes: [...mockVipCodes],
     isLiveSupabase: false
   };
 }
@@ -287,7 +232,6 @@ async function toggleProfileStatus(slug, currentActive) {
     return nextActive;
   }
 
-  // Update mock
   const p = mockProfiles.find(x => x.slug === slug);
   if (p) p.is_active = nextActive;
   return nextActive;
@@ -306,10 +250,33 @@ async function toggleProfileVerification(slug, currentVerified) {
     return nextVerified;
   }
 
-  // Update mock
   const p = mockProfiles.find(x => x.slug === slug);
   if (p) p.verified = nextVerified;
   return nextVerified;
+}
+
+async function toggleProfileVipStatus(slug, currentVip) {
+  const client = getSupabaseClient();
+  const nextVip = !currentVip;
+
+  if (client) {
+    const { error } = await client
+      .from('profiles')
+      .update({ 
+        is_vip: nextVip,
+        vip_badge: nextVip ? 'VIP CREATOR' : null
+      })
+      .eq('slug', slug);
+    if (error) throw error;
+    return nextVip;
+  }
+
+  const p = mockProfiles.find(x => x.slug === slug);
+  if (p) {
+    p.is_vip = nextVip;
+    p.vip_badge = nextVip ? 'VIP CREATOR' : null;
+  }
+  return nextVip;
 }
 
 async function updateProfileRemote(slug, updates) {
@@ -323,11 +290,8 @@ async function updateProfileRemote(slug, updates) {
     return true;
   }
 
-  // Update mock
   const p = mockProfiles.find(x => x.slug === slug);
-  if (p) {
-    Object.assign(p, updates);
-  }
+  if (p) Object.assign(p, updates);
   return true;
 }
 
@@ -342,7 +306,6 @@ async function deleteProfileRemote(slug) {
     return true;
   }
 
-  // Remove from mock
   mockProfiles = mockProfiles.filter(x => x.slug !== slug);
   return true;
 }
@@ -358,7 +321,56 @@ async function updatePlatformSettingsRemote(newSettings) {
     return true;
   }
 
-  // Update mock
   Object.assign(mockSettings, newSettings);
+  return true;
+}
+
+// VIP Codes Generator
+async function generateVipCodeRemote(tier = 'vip_pro') {
+  const randomChars = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const year = new Date().getFullYear();
+  const code = `VIP-${year}-${randomChars}`;
+
+  const client = getSupabaseClient();
+  if (client) {
+    const { data, error } = await client
+      .from('vip_codes')
+      .insert({
+        code: code,
+        tier: tier,
+        is_active: true,
+        is_used: false
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  const newCodeObj = {
+    id: String(Date.now()),
+    code: code,
+    tier: tier,
+    is_active: true,
+    is_used: false,
+    used_by_slug: null,
+    created_at: new Date().toISOString()
+  };
+  mockVipCodes.unshift(newCodeObj);
+  return newCodeObj;
+}
+
+async function deleteVipCodeRemote(id) {
+  const client = getSupabaseClient();
+  if (client) {
+    const { error } = await client
+      .from('vip_codes')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  }
+
+  mockVipCodes = mockVipCodes.filter(c => c.id !== id);
   return true;
 }
