@@ -8,12 +8,29 @@
  * 3. سحابة Supabase (في حال الرغبة بمشروع سحابي لاحقاً)
  */
 
-const PYTHON_API_URL = 'https://virgin-they-hose-musician.trycloudflare.com';
+const savedBackendUrl = (typeof localStorage !== 'undefined' && localStorage.getItem('biocraft_backend_url')) ? localStorage.getItem('biocraft_backend_url') : null;
+const DEFAULT_PYTHON_API_URL = 'https://biocraft-backend-hub.onrender.com';
+let PYTHON_API_URL = savedBackendUrl || DEFAULT_PYTHON_API_URL;
 const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const PUBLIC_PLATFORM_URL = 'https://1234567890vi.github.io/linkbio-generator';
 
 let isPythonHubActive = false;
+
+function setCustomBackendUrl(url) {
+  if (!url) {
+    if (typeof localStorage !== 'undefined') localStorage.removeItem('biocraft_backend_url');
+    PYTHON_API_URL = DEFAULT_PYTHON_API_URL;
+  } else {
+    url = url.trim().replace(/\/+$/, '');
+    if (typeof localStorage !== 'undefined') localStorage.setItem('biocraft_backend_url', url);
+    PYTHON_API_URL = url;
+  }
+}
+
+function getBackendUrl() {
+  return PYTHON_API_URL;
+}
 
 // كشف خادم بايثون عبر فحص فوري
 async function detectPythonHub() {
@@ -149,7 +166,7 @@ async function fetchDashboardData() {
           settings: data.settings || mockSettings,
           vipCodes: data.vipCodes || [],
           isLivePython: true,
-          statusLabel: 'متصل بخادم بايثون الحقيقي (Python Hub 🟢)'
+          statusLabel: 'متصل بخادم بايثون السحابي'
         };
       }
     } catch (e) {
@@ -167,7 +184,7 @@ async function fetchDashboardData() {
         settings: data.settings || mockSettings,
         vipCodes: data.vip_codes || mockVipCodes,
         isLiveSynced: true,
-        statusLabel: 'متصل عبر مزامنة GitHub المباشرة 🌐'
+        statusLabel: 'مزامنة GitHub المباشرة'
       };
     }
   } catch (e) {}
