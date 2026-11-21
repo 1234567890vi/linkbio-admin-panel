@@ -5,11 +5,19 @@ import re
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLOUDFLARED = os.path.join(BASE_DIR, "cloudflared.exe")
+CACERT = os.path.join(BASE_DIR, "cacert.pem")
 TUNNEL_URL_FILE = os.path.join(BASE_DIR, "tunnel_url.txt")
 
 def start_tunnel():
     print("[Tunnel] Starting Cloudflare Tunnel daemon...", flush=True)
-    cmd = [CLOUDFLARED, "tunnel", "--url", "http://127.0.0.1:8000", "--protocol", "http2"]
+    cmd = [
+        CLOUDFLARED,
+        "tunnel",
+        "--url", "http://127.0.0.1:8000",
+        "--origin-ca-pool", CACERT,
+        "--no-autoupdate",
+        "--protocol", "http2"
+    ]
     
     proc = subprocess.Popen(
         cmd,
