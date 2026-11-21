@@ -283,6 +283,134 @@ def get_dashboard_overview():
         "vipCodes": vip_codes
     }
 
+@app.get("/api/profiles")
+def get_all_profiles():
+    """واجهة برمجية لاسترجاع قائمة المواقع المسجلة بالكامل"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM profiles ORDER BY views_count DESC")
+    profiles = []
+    for r in cursor.fetchall():
+        p = dict(r)
+        p['verified'] = bool(p['verified'])
+        p['is_vip'] = bool(p['is_vip'])
+        p['is_active'] = bool(p['is_active'])
+        p['links_json'] = json.loads(p.get('links_json') or '[]')
+        p['vcard_json'] = json.loads(p.get('vcard_json') or '{}')
+        profiles.append(p)
+    conn.close()
+    return profiles
+
+@app.get("/api/profiles/{slug}")
+def get_single_profile(slug: str):
+    """استرجاع بيانات موقع معين عبر slug مع زيادة عداد الزيارات تلقائياً"""
+    target_slug = slug.strip().lower()
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # زيادة عداد الزيارات views_count
+    cursor.execute("UPDATE profiles SET views_count = views_count + 1 WHERE lower(slug) = ?", (target_slug,))
+    conn.commit()
+
+    cursor.execute("SELECT * FROM profiles WHERE lower(slug) = ?", (target_slug,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="الموقع المطلوب غير مسجل أو محذوف")
+
+    p = dict(row)
+    p['verified'] = bool(p['verified'])
+    p['is_vip'] = bool(p['is_vip'])
+    p['is_active'] = bool(p['is_active'])
+    p['links_json'] = json.loads(p.get('links_json') or '[]')
+    p['vcard_json'] = json.loads(p.get('vcard_json') or '{}')
+    return p
+
+class CreateProfilePayload(BaseModel):
+    slug: str
+    display_name: str
+    site_title: Optional[str] = ""
+    bio: Optional[str] = ""
+    avatar_data: Optional[str] = ""
+    avatar_zoom: Optional[float] = 1.0
+    avatar_pos_y: Optional[int] = 20
+    theme: Optional[str] = "obsidian"
+    bg_style: Optional[str] = "particles"
+    links_json: Optional[Any] = None
+    vcard_json: Optional[Any] = None
+
+@app.post("/api/profiles")
+def create_or_save_profile(payload: CreateProfilePayload):
+    """إنشاء أو تحديث موقع وحفظه مباشرة في قاعدة بيانات SQLite"""
+    slug = payload.slug.strip().lower()
+    if not slug:
+        raise HTTPException(status_code=400, detail="المعرف slug مطلوب")
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT allow_new_sites, maintenance_mode FROM platform_settings WHERE id = 1")
+    settings_row = cursor.fetchone()
+    if settings_row and not settings_row['allow_new_sites']:
+        cursor.execute("SELECT id FROM profiles WHERE lower(slug) = ?", (slug,))
+        if not cursor.fetchone():
+            conn.close()
+            raise HTTPException(status_code=403, detail="إنشاء المواقع الجديدة معطل حالياً من قِبل الإدارة")
+
+    links_str = json.dumps(payload.links_json if payload.links_json is not None else [], ensure_ascii=False) if not isinstance(payload.links_json, str) else payload.links_json
+    vcard_str = json.dumps(payload.vcard_json if payload.vcard_json is not None else {}, ensure_ascii=False) if not isinstance(payload.vcard_json, str) else payload.vcard_json
+    now = datetime.utcnow().isoformat()
+
+    cursor.execute("SELECT id, verified, is_vip, vip_badge, is_active FROM profiles WHERE lower(slug) = ?", (slug,))
+    existing = cursor.fetchone()
+
+    if existing:
+        cursor.execute("""
+        UPDATE profiles
+        SET display_name = ?, site_title = ?, bio = ?, avatar_data = ?,
+            avatar_zoom = ?, avatar_pos_y = ?, theme = ?, bg_style = ?,
+            links_json = ?, vcard_json = ?, updated_at = ?
+        WHERE lower(slug) = ?
+        """, (payload.display_name, payload.site_title or payload.display_name, payload.bio or "",
+              payload.avatar_data or "", payload.avatar_zoom, payload.avatar_pos_y, payload.theme or "obsidian",
+              payload.bg_style or "particles", links_str, vcard_str, now, slug))
+    else:
+        new_id = f"p_{random.randint(10000, 99999)}"
+        cursor.execute("""
+        INSERT INTO profiles (id, slug, site_title, display_name, bio, avatar_data, avatar_zoom, avatar_pos_y,
+                              theme, bg_style, verified, is_vip, vip_badge, is_active, links_json, vcard_json,
+                              views_count, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, NULL, 1, ?, ?, 0, ?, ?)
+        """, (new_id, slug, payload.site_title or payload.display_name, payload.display_name, payload.bio or "",
+              payload.avatar_data or "", payload.avatar_zoom, payload.avatar_pos_y, payload.theme or "obsidian",
+              payload.bg_style or "particles", links_str, vcard_str, now, now))
+
+    conn.commit()
+    conn.close()
+
+    # تحديث الملف الثابت للمزامنة
+    sync_to_generator_file()
+
+    return {
+        "success": True,
+        "slug": slug,
+        "live_url": f"https://1234567890vi.github.io/linkbio-generator/view.html?slug={slug}",
+        "message": "تم حفظ الموقع وتحديث قاعدة البيانات بنجاح"
+    }
+
+@app.get("/api/settings")
+def get_platform_settings():
+    """استرجاع إعدادات المنصة الحالية"""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM platform_settings WHERE id = 1")
+    settings = dict(cursor.fetchone() or {})
+    settings['maintenance_mode'] = bool(settings.get('maintenance_mode', 0))
+    settings['allow_new_sites'] = bool(settings.get('allow_new_sites', 1))
+    conn.close()
+    return settings
+
 class ToggleRequest(BaseModel):
     slug: str
     current: bool

@@ -1,1 +1,6 @@
 .vercel
+cloudflared.exe
+__pycache__/
+*.pyc
+*.sqlite
+tunnel_url.txt
