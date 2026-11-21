@@ -39,6 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def on_startup():
+    """تهيئة قاعدة البيانات تلقائياً فور إقلاع التطبيق على السحابة أو محلياً"""
+    init_db()
+
 # ====================================================================
 # 1. تهيئة قاعدة بيانات SQLite (Database Initialization)
 # ====================================================================
@@ -593,9 +598,11 @@ def trigger_github_sync():
 
 if __name__ == "__main__":
     init_db()
+    port = int(os.environ.get("PORT", 8000))
+    host = "0.0.0.0"
     print("\n" + "=" * 60)
-    print("  🚀 BioCraft Python Control Hub is starting...")
-    print("  📍 API URL: http://127.0.0.1:8000")
-    print("  📑 Docs:    http://127.0.0.1:8000/docs")
+    print("  BioCraft Python Control Hub is starting...")
+    print(f"  API URL: http://{host}:{port}")
+    print(f"  Docs:    http://{host}:{port}/docs")
     print("=" * 60 + "\n")
-    uvicorn.run("backend_server:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("backend_server:app", host=host, port=port, reload=False)

@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: biocraft-backend-hub
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend_server:app --host 0.0.0.0 --port $PORT
+    plan: free
+    autoDeploy: true
